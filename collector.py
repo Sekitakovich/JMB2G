@@ -15,6 +15,7 @@ from receiver import Receiver, Antenna, Packet, StreamType
 class Sentence(object):
     item: List[str] = field(default_factory=list)
     raw: bytes = b''
+    at: dt = dt.now()
     error: int = 0
 
     class Error(IntEnum):
@@ -26,7 +27,6 @@ class Sentence(object):
 class Stock(object):
     # item: List[str] = field(default_factory=list)
     nmea: List[Sentence] = field(default_factory=list)
-    at: dt = dt.now()
     ip: str = ''
     # raw: bytes = b''
     member: str = ''
@@ -80,7 +80,7 @@ class Format450(object):
                     ppp = raw.decode().split('*')
                     item = ppp[0].split(',')
                     error = Sentence.Error.none if NMEA.checksum(raw=raw) else Sentence.Error.badSum
-                    sentence.append(Sentence(raw=raw, item=item, error=error))
+                    sentence.append(Sentence(raw=raw, item=item, error=error, at=dt.now()))
 
         except (IndexError,) as e:
             stock.valid = False
